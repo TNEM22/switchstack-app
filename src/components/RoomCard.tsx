@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ChevronUp, ChevronDown } from 'lucide-react';
+import { ChevronUp, ChevronDown, Route, RouteOff } from 'lucide-react';
 
 import {
   Card,
@@ -11,6 +11,12 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 import { useWebSocket } from '@/context/WebSocketContext';
 import { useRooms, Room, Switch as SwitchType } from '@/context/RoomContext';
@@ -34,6 +40,7 @@ export function RoomCard({
 }: RoomCardProps) {
   // const [isHovered, setIsHovered] = useState(false);
   // const { toggleSwitch, reorderRooms } = useRooms();
+  //   const isDeviceOnline = false;
   const { reorderRooms } = useRooms();
   const { toggleSwitch } = useWebSocket();
 
@@ -68,8 +75,8 @@ export function RoomCard({
   return (
     <Link to={`/rooms/${room.esp_id}`} className='block'>
       <motion.div
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        // whileHover={{ scale: 1.02 }}
+        // whileTap={{ scale: 0.98 }}
         // onHoverStart={() => setIsHovered(true)}
         // onHoverEnd={() => setIsHovered(false)}
         className='relative'
@@ -110,7 +117,35 @@ export function RoomCard({
               >
                 <DynamicIcon name={room.icon} className='h-5 w-5' />
               </motion.div>
-              {room.name}
+              <div className='flex-1 flex justify-between'>
+                {room.name}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      {room.isOnline ? (
+                        <Badge
+                          variant='outline'
+                          className='gap-1 border-green-500 text-green-500'
+                        >
+                          <Route className='h-3 w-3' />
+                          <span className='hidden md:inline'>Connected</span>
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant='outline'
+                          className='gap-1 border-destructive text-destructive cursor-pointer hover:bg-destructive/10'
+                        >
+                          <RouteOff className='h-3 w-3' />
+                          <span>Disconnected</span>
+                        </Badge>
+                      )}
+                    </TooltipTrigger>
+                    <TooltipContent className='z-20'>
+                      {room.isOnline ? 'Device is online' : 'Device is offline'}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent>

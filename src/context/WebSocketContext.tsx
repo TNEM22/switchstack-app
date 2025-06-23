@@ -184,31 +184,50 @@ export const WebSocketProvider = ({
         const message = event.data;
         const parsedMessage = JSON.parse(message);
 
-        const { espId, switchId, state } = parsedMessage;
-        const esp = rooms.find((room) => room.esp_id === espId);
-        const room_switch = esp?.switches.find((sw) => sw._id === switchId);
+        // console.log('WebSocket message received:', parsedMessage);
+        const { status, espId, switchId, state } = parsedMessage;
 
-        if (room_switch && room_switch.state !== state) {
-          setRooms(
-            rooms.map((room) => {
-              if (room.esp_id === espId) {
-                return {
-                  ...room,
-                  switches: room.switches.map((sw) => {
-                    if (sw._id === switchId) {
-                      return { ...sw, state: state };
-                    }
-                    return sw;
-                  }),
-                };
-              }
-              return room;
-            })
-          );
+        if (status === 'error') {
+          const esp = rooms.find((room) => room.esp_id === espId);
+          const room_switch = esp?.switches.find((sw) => sw._id === switchId);
+
+          if (room_switch && room_switch.state !== state) {
+            setRooms(
+              rooms.map((room) => {
+                if (room.esp_id === espId) {
+                  return {
+                    ...room,
+                    switches: room.switches.map((sw) => {
+                      if (sw._id === switchId) {
+                        return { ...sw, state: state };
+                      }
+                      return sw;
+                    }),
+                  };
+                }
+                return room;
+              })
+            );
+          }
+        } else if (status === 'info') {
+          // console.log('Server ws:', parsedMessage);
+          const esp = rooms.find((room) => room._id === espId);
+          if (esp) {
+            setRooms(
+              rooms.map((room) => {
+                if (room._id === espId) {
+                  return {
+                    ...room,
+                    isOnline: state === 'connected',
+                  };
+                }
+                return room;
+              })
+            );
+          }
         }
-
         // Show toast if toggle was failed
-        if (parsedMessage.status === 'error') {
+        if (status === 'error') {
           toast.error(`Error toggling switch: ${parsedMessage.message}`);
           return;
         }

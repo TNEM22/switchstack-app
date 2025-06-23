@@ -23,6 +23,8 @@ export interface Room {
   switches: Switch[];
   order: number;
   type?: 'demo'; // 'demo' for demo rooms, null for real rooms
+  _id?: string;
+  isOnline: boolean;
 }
 
 interface RoomContextType {
@@ -200,6 +202,7 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
                     name: apiRoom.name,
                     icon: apiRoom.icon,
                     switches: updatedSwitches,
+                    isOnline: apiRoom.isOnline, // Update online status
                   };
                 }
                 return room;
@@ -286,6 +289,7 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
         icon,
         switches: switches,
         order: rooms.length,
+        isOnline: true, // Default to true
       };
       // To check if switch is for demo purpose..
       if (device_id === 'demo') {
