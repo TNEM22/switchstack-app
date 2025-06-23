@@ -187,7 +187,23 @@ export const WebSocketProvider = ({
         // console.log('WebSocket message received:', parsedMessage);
         const { status, espId, switchId, state } = parsedMessage;
 
-        if (status === 'error') {
+        if (status === 'info') {
+          // console.log('Server ws:', parsedMessage);
+          const esp = rooms.find((room) => room._id === espId);
+          if (esp) {
+            setRooms(
+              rooms.map((room) => {
+                if (room._id === espId) {
+                  return {
+                    ...room,
+                    isOnline: state === 'connected',
+                  };
+                }
+                return room;
+              })
+            );
+          }
+        } else {
           const esp = rooms.find((room) => room.esp_id === espId);
           const room_switch = esp?.switches.find((sw) => sw._id === switchId);
 
@@ -203,22 +219,6 @@ export const WebSocketProvider = ({
                       }
                       return sw;
                     }),
-                  };
-                }
-                return room;
-              })
-            );
-          }
-        } else if (status === 'info') {
-          // console.log('Server ws:', parsedMessage);
-          const esp = rooms.find((room) => room._id === espId);
-          if (esp) {
-            setRooms(
-              rooms.map((room) => {
-                if (room._id === espId) {
-                  return {
-                    ...room,
-                    isOnline: state === 'connected',
                   };
                 }
                 return room;
