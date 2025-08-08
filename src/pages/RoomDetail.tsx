@@ -1,14 +1,7 @@
+import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { PageTransition } from '@/components/PageTransition';
-import { NavBar } from '@/components/NavBar';
-import { useRooms } from '@/context/RoomContext';
-import { SwitchItem } from '@/components/SwitchItem';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { IconSelector } from '@/components/IconSelector';
 import {
   Plus,
   ArrowLeft,
@@ -28,6 +21,20 @@ import {
   User,
   Mail,
 } from 'lucide-react';
+
+import { SERVER_URL } from '@/constants';
+
+import { useRooms } from '@/context/RoomContext';
+
+import { useIsMobile } from '@/hooks/use-mobile';
+
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { toast } from '@/components/ui/sonner';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Dialog,
   DialogContent,
@@ -37,16 +44,14 @@ import {
   DialogDescription,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { DynamicIcon } from '@/components/DynamicIcon';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { toast } from '@/components/ui/sonner';
-import { SERVER_URL } from '@/constants';
+
+import { NavBar } from '@/components/NavBar';
 import { useAuth } from '@/context/AuthContext';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import axios from 'axios';
-import { set } from 'react-hook-form';
+import { SwitchItem } from '@/components/SwitchItem';
+import { DynamicIcon } from '@/components/DynamicIcon';
+import { IconSelector } from '@/components/IconSelector';
+import { PageTransition } from '@/components/PageTransition';
+import { RoomBluetoothSetup } from '@/components/RoomBluetoothSetup';
 
 // Add interface for room users
 interface RoomUser {
@@ -448,6 +453,9 @@ export default function RoomDetail() {
 
                 {/* Actions section with edit, delete, and dragging toggle buttons */}
                 <div className='flex flex-wrap gap-2 ml-11 md:ml-0'>
+                  {/* WiFi Setup via Bluetooth */}
+                  <RoomBluetoothSetup room={room} />
+
                   {/* Room Users Management Dialog */}
                   <RoomUsersDialog
                     roomId={roomId!}
